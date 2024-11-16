@@ -33,7 +33,6 @@ tp = Image.open(imagefile)
 
 draw = ImageDraw.Draw(tp)
 draw.text((158,600),text,(255,255,255),font=font)
-tp.show()
 
 tp.save("res.png")
 
