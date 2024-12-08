@@ -1,8 +1,4 @@
-from PIL import ImageFont
-from PIL import Image,ImageTk
-from PIL import ImageDraw
-from PIL import ImageFilter
-from PIL import ImageOps
+from PIL import ImageFont,Image,ImageTk,ImageDraw,ImageFilter,ImageOps
 from random import randint
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -16,9 +12,11 @@ os.chdir(os.path.dirname(__file__))  # 修正工作目录
 
 with open("tips.txt","r",encoding="utf-8") as f:
     tips = f.readlines()
-pool=[]
-sp_pool=[]
+pool:list[str]=[]
+sp_pool:list[str]=[]
 for i in tips:
+    if i.startswith("//") or i=="\n":
+        continue
     if i.startswith("<date="):
         if i.split(">")[0][6:]==time.strftime("%m.%d", time.localtime()):
             sp_pool.append("".join(i.split(">")[1:]))
@@ -30,8 +28,9 @@ else:
     text = pool[randint(0,len(pool)-1)]
 if len(text)>50:
     text = text[:49]+"\n"+text[49:]
-    
-# text = "英国皇家学会恩情课文《牛顿爷爷用平面几何证明万有引力定律》"  #调试
+text = text.replace("<br>","\n")
+
+# text = "英国皇家学会恩情课文\n《牛顿爷爷用平面几何证明万有引力定律》"  #调试
 # 处理图片
 def stack(background:Image.Image,foreground:Image.Image,x:int=0,y:int=0)->Image.Image:
     '''b叠加在a上'''    
@@ -123,13 +122,14 @@ def generate(alpha=120,blur=8,is_mirror=False,temp=False)->Image.Image:
         base_image.save("temp.png")
         shutil.copyfile("settings.json","temp_effective")
     else:
-        print("temp")
         base_image=Image.open("temp.png").convert("RGBA")
     tp = base_image
 
     draw = ImageDraw.Draw(tp)
     draw.text((158,600),text,(255,255,255),font=font)
-
+    
+    # 应用边缘发光效果
+    # edges = tp.filter(ImageFilter.FIND_EDGES)
     return tp
 
 if __name__=="__main__":
